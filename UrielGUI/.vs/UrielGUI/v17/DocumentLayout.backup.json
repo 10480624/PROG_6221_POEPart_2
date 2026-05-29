@@ -1,0 +1,36 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Student\\Documents\\PROG62121\\PROG_6221_POEPart_2\\UrielGUI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A81B3D86-EC8E-4C22-872B-8A613FDD53A5}|UrielGUI\\UrielGUI.csproj|c:\\users\\student\\documents\\prog62121\\prog_6221_poepart_2\\urielgui\\urielgui\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{A81B3D86-EC8E-4C22-872B-8A613FDD53A5}|UrielGUI\\UrielGUI.csproj|solutionrelative:urielgui\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Form1.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\Student\\Documents\\PROG62121\\PROG_6221_POEPart_2\\UrielGUI\\UrielGUI\\Form1.cs",
+              "RelativeDocumentMoniker": "UrielGUI\\Form1.cs",
+              "ToolTip": "C:\\Users\\Student\\Documents\\PROG62121\\PROG_6221_POEPart_2\\UrielGUI\\UrielGUI\\Form1.cs [Design]",
+              "RelativeToolTip": "UrielGUI\\Form1.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-29T08:15:03.474Z",
+              "EditorCaption": " [Design]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
