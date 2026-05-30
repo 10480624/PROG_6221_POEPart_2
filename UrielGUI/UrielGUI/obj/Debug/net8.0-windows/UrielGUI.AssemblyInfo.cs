@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("UrielGUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3947209cd45bd4d40b6b5463b614b2ffd0870c34")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a1f39133a7b5db704160cfe23fe8b377f84a9e77")]
 [assembly: System.Reflection.AssemblyProductAttribute("UrielGUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("UrielGUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

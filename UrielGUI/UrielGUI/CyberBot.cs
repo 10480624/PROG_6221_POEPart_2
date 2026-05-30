@@ -21,10 +21,22 @@ namespace UrielGUI
 
             string lower = input.Trim().ToLower();
 
+            // Sentiment detection with mood storage
             string sentimentResponse = _sentiment.Detect(lower);
-            if (sentimentResponse != null) return sentimentResponse;
+            if (sentimentResponse != null)
+            {
+                if (lower.Contains("worried") || lower.Contains("scared") || lower.Contains("afraid"))
+                    _memory.Store("mood", "Worried");
+                else if (lower.Contains("frustrated") || lower.Contains("angry") || lower.Contains("annoyed"))
+                    _memory.Store("mood", "Frustrated");
+                else if (lower.Contains("curious") || lower.Contains("wondering") || lower.Contains("how does"))
+                    _memory.Store("mood", "Curious");
+                else if (lower.Contains("great") || lower.Contains("thanks") || lower.Contains("awesome"))
+                    _memory.Store("mood", "Positive");
+                return sentimentResponse;
+            }
 
-            // "another tip" / "tell me more"
+            // "another tip" conversation flow
             if ((lower.Contains("another") || lower.Contains("more") || lower.Contains("explain")) && _lastTopic != null)
                 return _responses.GetResponse(_lastTopic);
 
@@ -43,18 +55,24 @@ namespace UrielGUI
                 return n != null ? $"Your name is {n}!" : "I don't know your name yet. Tell me!";
             }
 
-            // Introduction
+            // Introduction - "my name is"
             if (lower.StartsWith("my name is "))
             {
                 string name = input.Substring(11).Trim();
                 _memory.Store("name", name);
                 return $"Nice to meet you, {name}! How can I help you stay safe online?";
             }
+
+            // Introduction - "i am" / "i'm" (improved: skip sentiment words)
             if (lower.StartsWith("i am ") || lower.StartsWith("i'm "))
             {
-                string name = lower.Contains("i'm ") ? input.Substring(4).Trim() : input.Substring(5).Trim();
-                _memory.Store("name", name);
-                return $"Hello, {name}! Ask me about passwords, scams, SASSA, or safe browsing.";
+                string name = lower.StartsWith("i'm ") ? input.Substring(4).Trim() : input.Substring(5).Trim();
+                string[] sentimentWords = { "worried", "scared", "frustrated", "angry", "curious", "fine", "okay", "not" };
+                if (!Array.Exists(sentimentWords, w => name.ToLower().StartsWith(w)))
+                {
+                    _memory.Store("name", name);
+                    return $"Hello, {name}! Ask me about passwords, scams, SASSA, or safe browsing.";
+                }
             }
 
             // SA keyword detection (stores last topic)
@@ -68,7 +86,7 @@ namespace UrielGUI
             if (lower.Contains("browsing") || lower.Contains("website")) { _lastTopic = "browsing"; return _responses.GetResponse("browsing"); }
 
             // Conversational
-            if (lower.Contains("hello")) return "Hello! I'm Raphael, your South African cybersecurity assistant. Ask me about bank scams, SASSA, or passwords.";
+            if (lower.Contains("hello")) return "Hello! I'm Uriel, your South African cybersecurity assistant. Ask me about bank scams, SASSA, or passwords.";
             if (lower.Contains("thank")) return "You're welcome! Stay safe, and ask a family member before clicking on links.";
             if (lower.Contains("bye")) return "Hamba kahle! Remember: no bank or SASSA will ever ask for your PIN.";
 
