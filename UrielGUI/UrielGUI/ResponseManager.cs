@@ -1,100 +1,55 @@
-namespace RaphaelGUI
+using System;
+using System.Collections.Generic;
+
+namespace UrielGUI
 {
-    // This class satisfies the POE random responses requirement
-    // It stores multiple responses for each cybersecurity topic
-    // and randomly selects one to keep conversations fresh and engaging
-    // It uses Lists which satisfies the POE generic collections requirement
-    internal class ResponseManager
+    public class ResponseManager
     {
-        // Each of these lists stores multiple responses for one topic
-        // Having multiple responses means the bot never sounds repetitive
-        // Lists are used here to satisfy the POE generic collections requirement
-        private List<string> _phishingResponses { get; set; }
-        private List<string> _passwordResponses { get; set; }
-        private List<string> _privacyResponses { get; set; }
-        private List<string> _malwareResponses { get; set; }
-        private List<string> _safeBrowsingResponses { get; set; }
-
-        // Random object used to pick responses from the lists
-        private Random _random { get; set; }
-
-        // Constructor fills all response lists with multiple tips
-        // South African context is included where relevant
-        public ResponseManager()
+        private Random _rng = new Random();
+        private Dictionary<string, List<string>> _responses = new Dictionary<string, List<string>>()
         {
-            // PSEUDOCODE:
-            // INITIALISE random number generator
+            {"password", new List<string> {
+                "Never write down your password on paper. Use a password manager or save it in your phone's secure notes.",
+                "A strong password is like a good lock: use at least 12 characters, mix letters, numbers and symbols.",
+                "Don't use your birthday, child's name or 'password123'. Scammers guess those easily."
+            }},
+            {"phishing", new List<string> {
+                "Beware of SMS or emails saying your bank account is blocked. Never click the link. Call your bank using the number on your bank card.",
+                "Scammers pretend to be from Capitec, FNB, Absa or Standard Bank. They ask for your OTP or PIN. The real bank will never ask.",
+                "If you get a WhatsApp from a stranger saying you won a prize, delete it. That's a common trick called 'phishing'."
+            }},
+            {"malware", new List<string> {
+                "Never open attachments from people you don't know. They can install a virus on your phone or computer.",
+                "Don't download 'free' apps from unknown websites. Use the official Google Play Store or Apple App Store only.",
+                "If your phone starts showing strange ads or runs slowly, you might have malware. Ask a family member to scan it."
+            }},
+            {"privacy", new List<string> {
+                "Be careful what you share on Facebook. Scammers use your photos and information to trick you.",
+                "Don't post when you are going on holiday. Thieves watch those posts.",
+                "Cover your phone's screen when typing your PIN in public. Someone might be watching."
+            }},
+            {"browsing", new List<string> {
+                "Look for the little padlock icon in your browser's address bar before typing your ID number or bank details.",
+                "Don't use public WiFi at malls or taxis for banking. Use your phone's mobile data instead.",
+                "Update your phone and apps when it asks. Those updates fix security holes."
+            }},
+            {"sassa", new List<string> {
+                "SASSA will never send you an SMS asking for your ID or PIN. If you get one, ignore it and tell a relative.",
+                "Some scammers promise to 'help' you get a SASSA grant faster for a fee. That's a lie. Only go to the official SASSA office.",
+                "Your gold card is safe. Never give your card to a stranger, even if they say they work for SASSA."
+            }},
+            {"lottery", new List<string> {
+                "You cannot win a lottery you never entered. Delete those messages immediately.",
+                "If someone says you won a car or money but you must pay fees first – that's a scam. Real prizes don't ask for money.",
+                "The 'Nigerian prince' email is old but still used. Just delete it."
+            }}
+        };
 
-            // FILL _phishingResponses with tips such as:
-            //     "Be cautious of emails asking for personal information.
-            //      Scammers often disguise themselves as trusted organisations."
-            //     "Never click links in unexpected emails or SMSs.
-            //      Banks and SARS will never ask for your PIN via a link."
-            //     "Check the sender email address carefully.
-            //      Scammers use addresses that look almost correct but are slightly different."
-            //     "If an offer seems too good to be true it probably is.
-            //      This is a common tactic used in South African phishing scams."
-
-            // FILL _passwordResponses with tips such as:
-            //     "Use strong unique passwords for each account.
-            //      Avoid using personal info like your birthdate or ID number."
-            //     "A password manager can help you store and generate secure passwords."
-            //     "Never share your password with anyone including family members."
-            //     "Use a combination of letters numbers and symbols for stronger passwords."
-
-            // FILL _privacyResponses with tips such as:
-            //     "Review your social media privacy settings regularly."
-            //     "Do not share your ID number or banking details on public platforms."
-            //     "Be careful what personal information you post online."
-            //     "South African law protects your personal information under POPIA."
-
-            // FILL _malwareResponses with tips such as:
-            //     "Keep your antivirus software updated at all times."
-            //     "Never download attachments from unknown or unexpected senders."
-            //     "Avoid clicking on suspicious pop-up windows or ads."
-            //     "Malware can steal your banking details without you knowing."
-
-            // FILL _safeBrowsingResponses with tips such as:
-            //     "Only visit websites with HTTPS and the padlock icon in the address bar."
-            //     "Avoid doing your banking or shopping on public Wi-Fi."
-            //     "Keep your browser and operating system updated."
-            //     "Use a VPN when connecting to public networks for extra security."
-        }
-
-        // This method picks a random response for a given topic
-        // Called by CyberBot when a keyword is detected
-        public string GetRandomResponse(string topic)
+        public string GetResponse(string topic)
         {
-            // PSEUDOCODE:
-            // FIND the list matching the topic
-            // IF list found
-            //     PICK a random index between 0 and list length
-            //     RETURN the response at that index
-            // ELSE
-            //     RETURN default fallback response
-            return string.Empty;
-        }
-
-        // This method picks a different random response for follow up questions
-        // Called when user says "tell me more" or "another tip"
-        public string GetFollowUpResponse(string topic)
-        {
-            // PSEUDOCODE:
-            // Same as GetRandomResponse but ensures a different response
-            // is returned by tracking the last response index
-            return string.Empty;
-        }
-
-        // This method checks if a topic has responses available
-        // Used by CyberBot before trying to get a response
-        public bool TopicExists(string topic)
-        {
-            // PSEUDOCODE:
-            // IF topic matches any known list name
-            //     RETURN true
-            // ELSE
-            //     RETURN false
-            return false;
+            if (_responses.TryGetValue(topic.ToLower(), out var list))
+                return list[_rng.Next(list.Count)];
+            return null;
         }
     }
 }

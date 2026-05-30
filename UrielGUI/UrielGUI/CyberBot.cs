@@ -1,132 +1,78 @@
-namespace RaphaelGUI
+using System;
+
+namespace UrielGUI
 {
-    // This is the brain of the chatbot - expanded from Part 1
-    // It coordinates all the helper classes and processes user input
-    // It follows the same separation of concerns principle as Part 1
-    // CyberBot never touches the UI directly - that is MainForms job
-    internal class CyberBot
+    public class CyberBot
     {
-        // Automatic properties carried over from Part 1
-        // These satisfy the POE automatic properties requirement
-        public string BotName { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
+        private ResponseManager _responses = new ResponseManager();
+        private SentimentDetector _sentiment = new SentimentDetector();
+        private MemoryManager _memory = new MemoryManager();
+        private string _lastTopic = null;
 
-        // LastTopic remembers what was last discussed
-        // Used for follow up questions like "tell me more"
-        public string LastTopic { get; set; } = string.Empty;
+        public string GetName() => _memory.Recall("name");
+        public string GetMood() => _memory.Recall("mood");
 
-        // Private helper objects - each has one specific job
-        // readonly means they are set once in constructor and never changed
-        private readonly ResponseManager _responseManager;
-        private readonly SentimentDetector _sentimentDetector;
-        private readonly MemoryManager _memoryManager;
-
-        // Constructor creates all helper objects and sets the bot name
-        public CyberBot()
+        public string ProcessInput(string input)
         {
-            // PSEUDOCODE:
-            // SET BotName to "Raphael"
-            // CREATE new ResponseManager
-            // CREATE new SentimentDetector
-            // CREATE new MemoryManager
-        }
+            if (string.IsNullOrWhiteSpace(input))
+                return "Please type a message first.";
+            if (input.Length > 300)
+                return "That message is too long. Please keep it under 300 characters.";
 
-        // This method returns the opening greeting when the app starts
-        // It checks memory first to personalise the message if possible
-        public string Greet()
-        {
-            // PSEUDOCODE:
-            // IF MemoryManager has stored a name
-            //     RETURN "Welcome back " + stored name + "! How can I help you today?"
-            // ELSE
-            //     RETURN general welcome message explaining what Raphael can do
-            return string.Empty;
-        }
+            string lower = input.Trim().ToLower();
 
-        // This is the main method - processes every message the user sends
-        // It checks inputs in a specific order to ensure correct responses
-        // Order matters - sentiment first then follow ups then keywords
-        public string ProcessInput(string userMessage)
-        {
-            // PSEUDOCODE:
+            string sentimentResponse = _sentiment.Detect(lower);
+            if (sentimentResponse != null) return sentimentResponse;
 
-            // STEP 1 - VALIDATE INPUT
-            // IF userMessage is empty or whitespace
-            //     RETURN "Please type a message so I can help you."
+            // "another tip" / "tell me more"
+            if ((lower.Contains("another") || lower.Contains("more") || lower.Contains("explain")) && _lastTopic != null)
+                return _responses.GetResponse(_lastTopic);
 
-            // STEP 2 - CLEAN INPUT
-            // SET cleanMessage to lowercase trimmed userMessage
+            // Store user interest
+            if (lower.Contains("interested in") || (lower.Contains("like") && lower.Contains("privacy")))
+            {
+                string topic = lower.Contains("privacy") ? "privacy" : "cybersecurity";
+                _memory.Store("interest", topic);
+                return $"Great! I'll remember you're interested in {topic}. Ask me anything about it.";
+            }
 
-            // STEP 3 - CHECK FOR SENTIMENT FIRST
-            // SET sentimentResponse = SentimentDetector.DetectSentiment(cleanMessage)
-            // IF sentimentResponse is not empty
-            //     STORE detected sentiment in MemoryManager with key "mood"
-            //     RETURN sentimentResponse + follow up tip on LastTopic if available
+            // Name recall
+            if (lower.Contains("what is my name") || lower.Contains("do you remember my name"))
+            {
+                string n = _memory.Recall("name");
+                return n != null ? $"Your name is {n}!" : "I don't know your name yet. Tell me!";
+            }
 
-            // STEP 4 - CHECK FOR FOLLOW UP QUESTIONS
-            // IF cleanMessage contains "tell me more" or "another tip"
-            //     or "explain more" or "give me more"
-            //     IF LastTopic is not empty
-            //         RETURN ResponseManager.GetFollowUpResponse(LastTopic)
-            //     ELSE
-            //         RETURN "What topic would you like to know more about?
-            //                 You can ask about phishing passwords or privacy."
+            // Introduction
+            if (lower.StartsWith("my name is "))
+            {
+                string name = input.Substring(11).Trim();
+                _memory.Store("name", name);
+                return $"Nice to meet you, {name}! How can I help you stay safe online?";
+            }
+            if (lower.StartsWith("i am ") || lower.StartsWith("i'm "))
+            {
+                string name = lower.Contains("i'm ") ? input.Substring(4).Trim() : input.Substring(5).Trim();
+                _memory.Store("name", name);
+                return $"Hello, {name}! Ask me about passwords, scams, SASSA, or safe browsing.";
+            }
 
-            // STEP 5 - CHECK FOR MEMORY REQUESTS
-            // IF cleanMessage contains "what do you remember"
-            //     or "what do you know about me"
-            //     RETURN MemoryManager.GetMemorySummary()
+            // SA keyword detection (stores last topic)
+            if (lower.Contains("sassa") || lower.Contains("pension")) { _lastTopic = "sassa"; return _responses.GetResponse("sassa"); }
+            if (lower.Contains("lottery") || lower.Contains("prize")) { _lastTopic = "lottery"; return _responses.GetResponse("lottery"); }
+            if (lower.Contains("capitec") || lower.Contains("fnb") || lower.Contains("absa") || lower.Contains("bank")) { _lastTopic = "phishing"; return _responses.GetResponse("phishing"); }
+            if (lower.Contains("password")) { _lastTopic = "password"; return _responses.GetResponse("password"); }
+            if (lower.Contains("phishing") || lower.Contains("scam")) { _lastTopic = "phishing"; return _responses.GetResponse("phishing"); }
+            if (lower.Contains("malware") || lower.Contains("virus")) { _lastTopic = "malware"; return _responses.GetResponse("malware"); }
+            if (lower.Contains("privacy")) { _lastTopic = "privacy"; return _responses.GetResponse("privacy"); }
+            if (lower.Contains("browsing") || lower.Contains("website")) { _lastTopic = "browsing"; return _responses.GetResponse("browsing"); }
 
-            // STEP 6 - CHECK FOR NAME INTRODUCTION
-            // IF cleanMessage contains "my name is"
-            //     EXTRACT name from message after "my name is"
-            //     STORE name in MemoryManager with key "name"
-            //     SET UserName to extracted name
-            //     RETURN "Nice to meet you " + name + "! How can I help you stay safe online?"
+            // Conversational
+            if (lower.Contains("hello")) return "Hello! I'm Raphael, your South African cybersecurity assistant. Ask me about bank scams, SASSA, or passwords.";
+            if (lower.Contains("thank")) return "You're welcome! Stay safe, and ask a family member before clicking on links.";
+            if (lower.Contains("bye")) return "Hamba kahle! Remember: no bank or SASSA will ever ask for your PIN.";
 
-            // STEP 7 - CHECK FOR INTEREST DECLARATION
-            // IF cleanMessage contains "interested in" or "i care about"
-            //     EXTRACT topic from message
-            //     STORE topic in MemoryManager with key "interest"
-            //     RETURN "Great! I will remember that you are interested in " + topic
-            //             + ". It is an important part of staying safe online."
-
-            // STEP 8 - CHECK CYBERSECURITY KEYWORDS
-            // IF cleanMessage contains "phishing" or "scam"
-            //     SET LastTopic to "phishing"
-            //     RETURN ResponseManager.GetRandomResponse("phishing")
-
-            // IF cleanMessage contains "password"
-            //     SET LastTopic to "password"
-            //     RETURN ResponseManager.GetRandomResponse("password")
-
-            // IF cleanMessage contains "privacy"
-            //     SET LastTopic to "privacy"
-            //     RETURN ResponseManager.GetRandomResponse("privacy")
-
-            // IF cleanMessage contains "malware" or "virus"
-            //     SET LastTopic to "malware"
-            //     RETURN ResponseManager.GetRandomResponse("malware")
-
-            // IF cleanMessage contains "browsing" or "safe browsing"
-            //     SET LastTopic to "safe browsing"
-            //     RETURN ResponseManager.GetRandomResponse("safe browsing")
-
-            // STEP 9 - CHECK CONVERSATIONAL PROMPTS
-            // IF cleanMessage contains "how are you"
-            //     RETURN "I am fully operational and ready to help you stay safe online."
-
-            // IF cleanMessage contains "purpose" or "who are you"
-            //     RETURN description of Raphael and the SA cybersecurity campaign
-
-            // IF cleanMessage contains "what can i ask" or "topics" or "help"
-            //     RETURN list of all available topics with brief descriptions
-
-            // STEP 10 - DEFAULT FALLBACK
-            // RETURN "I am not sure about that. Try asking about passwords
-            //         phishing privacy or safe browsing."
-
-            return string.Empty;
+            return "I'm not sure about that. Try asking: 'bank scam', 'SASSA', 'password help', or 'another tip'.";
         }
     }
 }
