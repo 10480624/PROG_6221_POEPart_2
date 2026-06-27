@@ -96,16 +96,6 @@
             this.lblTopics.Text = "TOPICS";
 
             // Buttons – uniform size & margin
-            foreach (var btn in new[] { this.btnPasswords, this.btnPhishing, this.btnMalware, this.btnPrivacy, this.btnClearChat })
-            {
-                btn.BackColor = System.Drawing.Color.FromArgb(45, 45, 45);
-                btn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-                btn.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular);
-                btn.ForeColor = System.Drawing.Color.White;
-                btn.Size = new System.Drawing.Size(155, 32);
-                btn.Margin = new System.Windows.Forms.Padding(0, 0, 0, 8);
-                btn.UseVisualStyleBackColor = false;
-            }
             this.btnPasswords.Text = "Passwords";
             this.btnPasswords.Click += new System.EventHandler(this.btnPasswords_Click);
             this.btnPhishing.Text = "Phishing";

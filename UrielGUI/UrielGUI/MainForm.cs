@@ -60,8 +60,7 @@
 
             AppendMessage("YOU", userInput);
             txtUserInput.Clear();
-            txtUserInput.Text = "Ask me about cybersecurity...";
-            txtUserInput.ForeColor = Color.Gray;
+            txtUserInput.ForeColor = Color.White;
 
             string response = _bot.ProcessInput(userInput);
             AppendMessage("URIEL", response);
