@@ -1,6 +1,5 @@
 PROG6221 POE — Part 3
 
-## URIEL – Cybersecurity Awareness Chatbot
 URIEL – Cybersecurity Awareness Chatbot
 
 South African edition · WinForms · .NET 8.0 · C#
